@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./src/css/style.css">
+    <script type="module" src="./src/js/script.js" defer></script>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="icon" href="./src/images/spotifyLogo.png" type="image/x-icon">
+    <title>Spotify</title>
+</head>
+<body>
+    <div id="music-selector">
+        <div id="left-page">
+            <div id="top">
+                <div id="window-buttons">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+                <div id="filters">
+                    <details>
+                        <summary>Filtros</summary>
+                        <p>Todos</p>
+                        <p>Favoritos</p>
+                    </details>
+                </div>
+            </div>
+            <div id="song-cover">
+                
+            </div>
+        </div>
+        <div id="right-page">
+            <div id="head">
+                <input type="search" placeholder="Search">
+                <i class='bx bx-search-alt'></i>
+                <div id="profile">
+                    <img src="./src/images/john_wick.jpg" alt="Profile photo">
+                    <h3>Antonio</h3>
+                </div>
+            </div>
+            <div id="controls">
+                <h1>Music</h1>
+                <div id="actions">
+                    <button id="pauseButton">PAUSE</button>
+                    <i id="addBtn" class='bx bxs-add-to-queue'></i>
+
+                    <div id="modal">
+                        <div class="modal-content">
+                            <span class="close">&times;</span>
+                            <form id="songForm">
+                                <label for="file-song">Añadir una nueva canción</label>
+                                <input type="file" id="file-song" name="music" accept=".mp3">
+                                <p id="error-file-song" class="error-message"></p>
+                                
+                                <label for="title-song">Título</label>
+                                <input type="text" id="title-song" name="title">
+                                <p id="error-title-song" class="error-message"></p>
+                                
+                                <label for="author-song">Autor</label>
+                                <input type="text" id="author-song" name="artist">
+                                <p id="error-author-song" class="error-message"></p>
+                                
+                                <label for="image-song">Imagen de portada</label>
+                                <input type="file" id="image-song" name="cover" accept=".jpg, .png">
+                                <p id="error-image-song" class="error-message"></p>
+                                
+                                <button type="submit">Subir</button>
+                            </form>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="songs">
+                <div id="songs">
+                    <div id="songs-header">
+                        <span></span>
+                        <span>TITULO</span>
+                        <span>ARTISTA</span>
+                        <span><i class="bx bx-time-five"></i></span>
+                        <span></span>
+                    </div>
+                    <div id="songs-content">
+                        
+                    </div>
+                </div>                
+            </div>
+        </div>
+    </div>
+    <div id="music-player">
+        <div id="actual-song">
+            <p id="currentSongTitle">Canción actual</p>
+            <p id="currentSongArtist">Artista</p>
+            <div id="song-cover-container"></div>
+        </div>
+        <div id="reproductor">
+            <div id="reproductor-options">
+                <i class="bx bx-repeat"></i>
+                <i class="bx bx-skip-previous"></i>
+                <i id="playPauseButton" class="bx bx-play-circle"></i>
+                <i class="bx bx-skip-next"></i>
+                <i class="bx bx-shuffle"></i>
+            </div>
+            <div id="reproductor-bar">
+                <p id="currentTime">0:00</p>
+                <progress id="progress-bar" max="100" value="0"></progress>
+                <p id="totalTime">0:00</p>
+            </div>
+        </div>
+        <div id="volume-control">
+            <i class="bx bxs-volume-low"></i>
+            <input type="range" id="volume-bar" max="100" value="50">
+        </div>
+    </div>
+</body>
+</html>
