@@ -568,8 +568,18 @@ document.querySelector("#filters").addEventListener("click", (event) => {
     }
 });
 
-// Función para inicializar
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener('DOMContentLoaded', () => {
     updateSongContainer("all"); // Cargar todas las canciones inicialmente
     updateActiveSongsList(); // Inicializar la lista de favoritos
+    const filterOptions = document.querySelectorAll('#filters p');
+
+    filterOptions.forEach(option => {
+        option.addEventListener('click', () => {
+            // Quitar la clase "active" de todos los filtros
+            filterOptions.forEach(opt => opt.classList.remove('active'));
+            
+            // Añadir la clase "active" al filtro seleccionado
+            option.classList.add('active');
+        });
+    });
 });
