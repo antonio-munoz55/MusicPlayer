@@ -1,9 +1,9 @@
 const modal = document.getElementById("modal");
 const modalOpen = document.getElementById("addBtn");
 const modalClose = document.getElementsByClassName("close")[0];
-const baseApiUrl = "http://informatica.iesalbarregas.com:7007/"; // Base URL para las API
+const baseApiUrl = "http://informatica.iesalbarregas.com:7008/";
 const apiUrl = `${baseApiUrl}songs`;
-const uploadUrl = `${baseApiUrl}upload`; // Endpoint para subir canciones
+const uploadUrl = `${baseApiUrl}upload`;
 const songsTableBody = document.querySelector("#songs tbody");
 const musicPlayer = document.getElementById("music-player");
 const playPauseButton = document.getElementById("playPauseButton");
@@ -19,13 +19,16 @@ const nextButton = document.querySelector(".bx-skip-next");
 const songContainer = document.getElementById("songs-content");
 const repeatButton = document.querySelector(".bx-repeat");
 const shuffleButton = document.querySelector(".bx-shuffle");
-let isShuffleActive = false;
+const fileSong = document.getElementById("file-song");
+const fileImage = document.getElementById("image-song");
 
-let audio = new Audio(); // Variable global para controlar el audio
+// Variables globales para el reproductor
+let audio = new Audio();
 let playing = false; // Estado de reproducción
 let currentSongIndex = -1; // Índice de la canción actual
 let songsList = []; // Lista de canciones cargadas
 let isRepeatActive = false; // Estado de repetición
+let isShuffleActive = false;
 
 // Variables para controlar el arrastre de la barra de progreso
 let isDragging = false;
@@ -47,6 +50,15 @@ window.onclick = function (event) {
     }
 };
 
+fileSong.addEventListener("change", () => {
+    fileSong.style.color = "#171717";
+});
+
+fileImage.addEventListener("change", () => {
+    fileImage.style.color = "#171717";
+});
+
+// Manejo del formulario para subir canciones
 document.getElementById("songForm").addEventListener("submit", function (event) {
     event.preventDefault(); // Prevenir envío del formulario
     let isValid = true;
@@ -101,7 +113,7 @@ document.getElementById("songForm").addEventListener("submit", function (event) 
 
                 songsList.push(data.result); // Agregar nueva canción a la lista
                 addSongToContainer(data.result); // Añadir la nueva canción al contenedor
-                
+
             })
             .catch(error => {
                 alert("Ocurrió un error al intentar subir la canción.");
@@ -155,15 +167,20 @@ function playNextSong() {
     const activeList = currentView === "favorites" ? favoriteSongsList : songsList;
 
     if (isShuffleActive) {
-        // Cambiar a canción aleatoria si el modo aleatorio está activado
-        currentSongIndex = Math.floor(Math.random() * activeList.length);
+        // Cambiar a una canción aleatoria diferente si el modo aleatorio está activado
+        let newIndex;
+        do {
+            newIndex = Math.floor(Math.random() * activeList.length);
+        } while (activeList.length > 1 && newIndex === currentSongIndex);
+
+        currentSongIndex = newIndex;
     } else {
         currentSongIndex++;
     }
 
-    // Reiniciar al principio si se llega al final de la lista
+    // Asegurarse de que el índice esté dentro de los límites
     if (currentSongIndex >= activeList.length) {
-        currentSongIndex = 0; // Ir a la primera canción
+        currentSongIndex = 0; // Volver al inicio
     }
 
     playSongByIndex(currentSongIndex);
@@ -318,10 +335,18 @@ playPauseButton.addEventListener("click", () => {
 });
 
 pauseButton.addEventListener("click", () => {
-    if (playing) {
-        audio.pause();
-        playing = false;
-        togglePlayPauseIcons(false);
+    if (audio.src) { // Verifica si hay una canción cargada
+        if (playing) {
+            audio.pause(); // Pausa la reproducción
+            playing = false;
+            togglePlayPauseIcons(false); // Actualiza el icono a "play"
+        } else {
+            audio.play(); // Reanuda la reproducción
+            playing = true;
+            togglePlayPauseIcons(true); // Actualiza el icono a "pause"
+        }
+    } else {
+        alert("No hay ninguna canción activa para pausar o reproducir.");
     }
 });
 
@@ -416,7 +441,7 @@ volumeBar.addEventListener("input", (event) => {
 volumeBar.addEventListener('input', function () {
     const value = (this.value - this.min) / (this.max - this.min) * 100;
     this.style.setProperty('--volumeBar', `${value}%`);
-  });
+});
 
 // Fetch de las canciones
 fetch(apiUrl)
@@ -434,69 +459,69 @@ fetch(apiUrl)
     })
     .catch((error) => console.error("Error loading songs:", error));
 
-    function addSongToContainer(song) {
-        const songCard = document.createElement("div");
-        songCard.classList.add("song-card");
-    
-        const playIcon = document.createElement("i");
-        playIcon.className = "bx bx-play";
-    
-        const title = document.createElement("span");
-        title.textContent = song.title;
-    
-        const artist = document.createElement("span");
-        artist.textContent = song.artist;
-    
-        const duration = document.createElement("span");
-        if (song.filepath) {
-            getAudioDuration(song.filepath).then((time) => {
-                duration.textContent = formatDuration(time);
-            });
-        }
-    
-        const favoriteIcon = document.createElement("i");
-        favoriteIcon.className = "bx bx-heart"; // Icono inicial
+function addSongToContainer(song) {
+    const songCard = document.createElement("div");
+    songCard.classList.add("song-card");
+
+    const playIcon = document.createElement("i");
+    playIcon.className = "bx bx-play";
+
+    const title = document.createElement("span");
+    title.textContent = song.title;
+
+    const artist = document.createElement("span");
+    artist.textContent = song.artist;
+
+    const duration = document.createElement("span");
+    if (song.filepath) {
+        getAudioDuration(song.filepath).then((time) => {
+            duration.textContent = formatDuration(time);
+        });
+    }
+
+    const favoriteIcon = document.createElement("i");
+    favoriteIcon.className = "bx bx-heart"; // Icono inicial
+    const favorites = getFavoritesFromLocalStorage();
+
+    // Actualizar el icono si es favorito
+    if (favorites.includes(song.filepath)) {
+        favoriteIcon.classList.replace("bx-heart", "bxs-heart");
+    }
+
+    // Evento para marcar/desmarcar como favorito
+    favoriteIcon.addEventListener("click", (e) => {
+        e.stopPropagation(); // Evita que se dispare el clic en el contenedor
         const favorites = getFavoritesFromLocalStorage();
-    
-        // Actualizar el icono si es favorito
+
         if (favorites.includes(song.filepath)) {
+            // Quitar de favoritos
+            favoriteIcon.classList.replace("bxs-heart", "bx-heart");
+            const index = favorites.indexOf(song.filepath);
+            favorites.splice(index, 1);
+        } else {
+            // Añadir a favoritos
             favoriteIcon.classList.replace("bx-heart", "bxs-heart");
+            favorites.push(song.filepath);
         }
-    
-        // Evento para marcar/desmarcar como favorito
-        favoriteIcon.addEventListener("click", (e) => {
-            e.stopPropagation(); // Evita que se dispare el clic en el contenedor
-            const favorites = getFavoritesFromLocalStorage();
-    
-            if (favorites.includes(song.filepath)) {
-                // Quitar de favoritos
-                favoriteIcon.classList.replace("bxs-heart", "bx-heart");
-                const index = favorites.indexOf(song.filepath);
-                favorites.splice(index, 1);
-            } else {
-                // Añadir a favoritos
-                favoriteIcon.classList.replace("bx-heart", "bxs-heart");
-                favorites.push(song.filepath);
-            }
-    
-            saveFavoritesToLocalStorage(favorites);
-        });
-    
-        songCard.appendChild(playIcon);
-        songCard.appendChild(title);
-        songCard.appendChild(artist);
-        songCard.appendChild(duration);
-        songCard.appendChild(favoriteIcon);
-    
-        // Evento para reproducir la canción al hacer clic
-        songCard.addEventListener("click", () => {
-            const activeList = currentView === "favorites" ? favoriteSongsList : songsList;
-            const index = activeList.findIndex(s => s.filepath === song.filepath);
-            playSongByIndex(index);
-        });
-    
-        songContainer.appendChild(songCard);
-    }    
+
+        saveFavoritesToLocalStorage(favorites);
+    });
+
+    songCard.appendChild(playIcon);
+    songCard.appendChild(title);
+    songCard.appendChild(artist);
+    songCard.appendChild(duration);
+    songCard.appendChild(favoriteIcon);
+
+    // Evento para reproducir la canción al hacer clic
+    songCard.addEventListener("click", () => {
+        const activeList = currentView === "favorites" ? favoriteSongsList : songsList;
+        const index = activeList.findIndex(s => s.filepath === song.filepath);
+        playSongByIndex(index);
+    });
+
+    songContainer.appendChild(songCard);
+}
 
 // Almacenar favoritos en localStorage
 function saveFavoritesToLocalStorage(favorites) {
@@ -514,9 +539,9 @@ function updateSongContainer(filter = "all") {
     songContainer.innerHTML = ""; // Limpia el contenedor
 
     const favorites = getFavoritesFromLocalStorage();
-    const filteredSongs = filter === "favorites" 
-        ? songsList.filter(song => favorites.includes(song.filepath)) 
-        : songsList;
+    const filteredSongs = filter === "favorites" ?
+        songsList.filter(song => favorites.includes(song.filepath)) :
+        songsList;
 
     filteredSongs.forEach((song, index) => {
         addSongToContainer(song);

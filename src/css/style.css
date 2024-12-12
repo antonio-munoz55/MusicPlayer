@@ -315,13 +315,27 @@ body {
     font-size: 1.7rem;
 }
 
+#reproductor-options>i:nth-child(1):hover,
+#reproductor-options>i:nth-child(5):hover{
+    font-size: 2rem;
+}
+
 #reproductor-options>i:nth-child(2),
 #reproductor-options>i:nth-child(4){
     font-size: 2.4rem;
 }
 
+#reproductor-options>i:nth-child(2):hover,
+#reproductor-options>i:nth-child(4):hover{
+    font-size: 2.7rem;
+}
+
 #reproductor-options>i:nth-child(3){
     font-size: 3rem;
+}
+
+#reproductor-options>i:nth-child(3):hover{
+    font-size: 3.3rem;
 }
 
 #reproductor-options>i {
@@ -466,4 +480,12 @@ input[type="text"], input[type="file"] {
     color: red;
     font-size: 0.9em;
     margin-top: 5px;
+}
+
+#file-song{
+    color: var(--spotify-white);
+}
+
+#image-song{
+    color: var(--spotify-white);
 }
